@@ -1,0 +1,21 @@
+.sidebar-items:hover {
+  background-color:color-mix(in oklab,var(--accent)100%,transparent);
+  color: var(--accent-foreground);
+}
+
+::-webkit-scrollbar-thumb {
+  z-index: 0;
+  display: block;
+  width: 10em;
+  overflow: auto;
+  background: var(--primary);
+}
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  background-color: var(--card);
+}
+
+.dark canvas#pdf-viewer {
+  filter: invert(64%) contrast(228%) brightness(80%) hue-rotate(180deg);
+}
