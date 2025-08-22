@@ -1,18 +1,12 @@
-# Qwik City App ⚡️
+# Document Signer APP (NFSIGN, temporary name)
 
-- [Qwik Docs](https://qwik.dev/)
-- [Discord](https://qwik.dev/chat)
-- [Qwik GitHub](https://github.com/QwikDev/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
-
+This project is a continuation of my thesis that implemented the backend(using python).
 ---
 
 ## Project Structure
 
 This project is using Qwik with [QwikCity](https://qwik.dev/qwikcity/overview/). QwikCity is just an extra set of tools on top of Qwik to make it easier to build a full site, including directory-based routing, layouts, and more.
 
-Inside your project, you'll see the following directory structure:
 
 ```
 ├── public/
@@ -20,11 +14,12 @@ Inside your project, you'll see the following directory structure:
 └── src/
     ├── components/
     │   └── ...
-    └── routes/
-        └── ...
+    ├── routes/
+    |   └── ...
+    └── utils/
 ```
 
-- `src/routes`: Provides the directory-based routing, which can include a hierarchy of `layout.tsx` layout files, and an `index.tsx` file as the page. Additionally, `index.ts` files are endpoints. Please see the [routing docs](https://qwik.dev/qwikcity/routing/overview/) for more info.
+- `src/routes`: Provides the directory-based routing, which can include a hierarchy of `layout.tsx` layout files, and an `index.tsx` file as the page. Additionally, `index.ts` files are endpoints.
 
 - `src/components`: Recommended directory for components.
 
