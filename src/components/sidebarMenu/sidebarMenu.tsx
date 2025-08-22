@@ -1,9 +1,10 @@
 import { component$, useSignal, $, useContext, QRL } from '@builder.io/qwik';
-import { LuChevronDown, LuChevronLeft, LuMenu } from '@qwikest/icons/lucide';
+import { LuChevronDown, LuChevronLeft, LuMenu, LuSettings } from '@qwikest/icons/lucide';
 import { SidebarItems } from '../sidebar-items/sidebar-items';
 import { LucideIcon } from '../icon/lucide-icons';
 import { SidebarContext } from '../../utils/context/sidebar-context';
 import { NavContext } from '../../utils/context/nav-items-context';
+import ThemeSwitcher from '../theme-switcher/theme-switcher';
 
 
 export const SidebarMenu = component$(() => {
@@ -37,16 +38,16 @@ export const SidebarMenu = component$(() => {
 
       <div
         class={[
-          'fixed z-30 h-full left-0 sidebar bg-sidebar flex',
+          'fixed z-30 h-full left-0 sidebar bg-sidebar flex flex-row',
           'transition-all duration-600 ease-in-out text-sm',
-          'overflow-y-auto',
+          '',
           sidebar.isOpen ? 'translate-x-0' : '-translate-x-full',
           'md:translate-x-0',
           sidebar.isMinified ? 'w-16' : 'w-64'
         ]}
         aria-label="Sidebar"
       >
-        <div class="h-full px-2 py-4 overflow-y-auto w-full flex flex-col">
+        <div class="h-full px-2 py-4 w-full flex flex-col">
           {/* Minify/Expand Toggle (Desktop only) */}
           <div class={`hidden md:flex transition-all w-full duration-600 pb-2 w-fit justify-end pe-1`}>
             <button
@@ -177,76 +178,14 @@ export const SidebarMenu = component$(() => {
           </li>
 
           </ul>
-
-          {/* <ul class="space-y-2">
-            <li>
-              <a
-                href="#"
-                class={[
-                  'flex items-center p-2 rounded-lg',
-                  'group'
-                ]}
-              >
-                <span class={[
-                  'flex-shrink-0',
-                  'size-5 flex items-center justify-center',
-                ]}>
-                  <LuHome class="size-5" />
-                </span>
-                {!sidebar.isMinified && (<span class={[
-                  'ms-3 whitespace-nowrap',
-                  'font-medium',
-                  'transition-opacity duration-200',
-                  sidebar.isMinified ? 'opacity-0 absolute' : 'opacity-100'
-                ]}>
-                  Dashboard
-                </span>
-                )}
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                class={[
-                  'flex items-center p-2 rounded-lg',
-                  'group'
-                ]}
-              >
-                <span class={[
-                  'flex-shrink-0',
-                  'size-5 flex items-center justify-center',
-                ]}>
-                  <LuCalendar class="size-5" />
-                </span>
-                
-                {!sidebar.isMinified && (
-                  <>
-                    <span class="ms-3">Calendar</span>
-                    <span class="ms-auto inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full">
-                      New
-                    </span>
-                  </>
-                )}
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                class={[
-                  'flex items-center p-2 rounded-lg',
-                  'group'
-                ]}
-              >
-                <span class={[
-                  'flex-shrink-0',
-                  'size-5 flex items-center justify-center',
-                ]}>
-                  <LuBookOpen class="size-5" />
-                </span>
-                {!sidebar.isMinified && <span class="ms-3">Documentation</span>}
-              </a>
-            </li>
-          </ul> */}
+          <div class="flex grow flex-col justify-end items-center">
+            <div class="flex items-center w-full justify-around">
+              <ThemeSwitcher/>
+              <button class="p-2 rounded-full transition-all duration-300 hover:bg-accent cursor-pointer">
+                <LuSettings class="size-6"/>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </>
