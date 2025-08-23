@@ -1,6 +1,11 @@
 # Document Signer APP (NFSIGN, temporary name)
 
 This project is a continuation of my thesis that implemented the backend(using python).
+- pdf reader using pdfjs-dist
+- fetch backend match response model
+- stamp document with "one click to stamp" (not yet implemented)
+- verify document (not yet implemented)
+
 ---
 
 ## Project Structure
