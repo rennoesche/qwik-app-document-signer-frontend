@@ -2,8 +2,8 @@ export interface User {
   id: number;
   username: string;
   full_name: string;
-  role: string;
-  is_superuser: boolean;
+  role?: string;
+  is_superuser?: boolean;
 }
 
 export interface Document {

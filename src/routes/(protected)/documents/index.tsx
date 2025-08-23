@@ -1,12 +1,12 @@
-import { $, component$, useComputed$, useContext } from '@builder.io/qwik';
+import { $, component$, useComputed$, useContext, useSignal } from '@builder.io/qwik';
 import { routeLoader$, useLocation, useNavigate } from '@builder.io/qwik-city'; 
 import { NavContext } from '~/utils/context/nav-items-context';
 import { DocumentsTable, stateFilter } from '~/components/documents-table/documents-table';
 import { ScrollArea } from '~/components/ui/scroll-area/scroll-area';
-import { SearchBar } from '~/components/ui/search-bar/search-bar';
 import { DocumentsResponse, type Document as DocumentItem } from '~/utils/documents'; 
-import { LuFilter } from '@qwikest/icons/lucide';
+import { LuFilter, LuUpload } from '@qwikest/icons/lucide';
 import { Button } from '~/components/ui/button/button';
+import { FileUploadPopup, UploadDocumentData } from '~/components/upload-popup/upload-popup';
 
 export const useDocuments = routeLoader$(async ({ cookie, fail }) => {
   try {
@@ -30,7 +30,7 @@ export const useDocuments = routeLoader$(async ({ cookie, fail }) => {
     }
 
     const data: DocumentsResponse = await response.json();
-    return data;
+    return {data, token};
   } catch (error) {
     console.error('Failed to fetch documents:', error);
     return fail(500, { message: 'Failed to load documents' });
@@ -40,7 +40,17 @@ export const useDocuments = routeLoader$(async ({ cookie, fail }) => {
 export default component$(() => {
   const loc = useLocation();
   const navStore = useContext(NavContext);
-  const nav = useNavigate(); 
+  const nav = useNavigate();
+  const showUploadPopUp = useSignal(false);
+  const isLoading = useSignal(false);
+
+  // dummy data
+  const users = [
+    { id: 1, full_name: 'John Doe', username: 'johndoe1' },
+    { id: 2, full_name: 'Jane Smith', username: 'janesmth' },
+    { id: 3, full_name: 'Bob Johnson', username: 'bobjohn33' },
+  ];
+  const currentUser = {id: 1, full_name: 'John Doe', username: 'johndoe1'};
 
   const label = useComputed$(() => {
     const currentPath = loc.url.pathname;
@@ -55,6 +65,14 @@ export default component$(() => {
 
   const documentsData = useDocuments();
   const state = stateFilter();
+  const token = documentsData.value.token;
+
+    const handleUpload = $((data: UploadDocumentData) => {
+    console.log("Upload success callback:", data);
+    // refresh dokumen setelah upload
+    // documentsData.refetch();
+    showUploadPopUp.value = false;
+  });
 
   const handleViewDocument = $((document: DocumentItem) => {
     console.log('View document:', document);
@@ -92,7 +110,17 @@ export default component$(() => {
       
       <div class="flex flex-1 flex-col gap-y-2 overflow-auto p-4">
         <div class="flex md:justify-between gap-x-2 px-2 items-center">
-          <Button/>
+          <Button onClick$={() => showUploadPopUp.value = true}>
+            <LuUpload class="size-6"/>
+          </Button>
+          <FileUploadPopup
+            authToken={token? token : ''}
+            users={users}
+            currentUser={currentUser}
+            show={showUploadPopUp}
+            onUpload$={handleUpload}
+            isLoading={isLoading.value}
+          />
           <div class="flex inline-flex items-center">
             {/* <SearchBar/> */}
             <div class="p-4 flex items-center">
@@ -109,7 +137,7 @@ export default component$(() => {
         <div class="flex-1 outline-none relative flex flex-col gap-4">
           <ScrollArea>
             <DocumentsTable
-              documents={documentsData.value || []}
+              documents={documentsData.value.data || []}
               onViewDocument$={handleViewDocument}
               onSignDocument$={handleSignDocument}
               onDownloadDocument={handleDownloadDocument}
