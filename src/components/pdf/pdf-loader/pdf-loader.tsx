@@ -2,7 +2,7 @@ import { component$, useSignal, useStore, useVisibleTask$ } from '@builder.io/qw
 import { qwikify$ } from '@builder.io/qwik-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-import { Progress } from '../../ui/progress';
+import { Progress } from '../../../integrations/components/ui/progress';
 import { PdfViewer } from '../pdf-viewer/pdf-viewer';
 
 const ProgressBar = qwikify$(Progress, { eagerness: 'idle' });

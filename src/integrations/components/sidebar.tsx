@@ -1,8 +1,8 @@
 /** @jsxImportSource react */
-import { Button } from '~/components/ui/button'
+import { Button } from '~/integrations/components/ui/button'
 import { cn } from '~/lib/utils'
 import { iconMap, homeMenu, certMenu, verifyMenu } from '../data/menu-items'
-import { ScrollArea } from '~/components/ui/scroll-area'
+import { ScrollArea } from '~/integrations/components/ui/scroll-area'
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   home: typeof homeMenu
