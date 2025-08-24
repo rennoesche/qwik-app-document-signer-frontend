@@ -46,34 +46,38 @@ export const LocalPdfViewer = component$(() => {
     }
   });
 
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     const pdf = track(() => pdfDocument.value);
     const currentScale = track(() => scale.value);
     const container = pdfContainer.value;
 
-    if (!pdf || !container) {
-      if (container) container.innerHTML = '';
-      return;
-    }
+    if (!container) return;
 
     container.innerHTML = '';
-    
+
+    if (!pdf) return;
+
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page: PDFPageProxy = await pdf.getPage(pageNum);
       const viewport = page.getViewport({ scale: currentScale });
+
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       if (!context) continue;
+
       canvas.height = viewport.height;
       canvas.width = viewport.width;
       canvas.style.marginBottom = '1rem';
       canvas.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+
       container.appendChild(canvas);
-      page.render({
+
+      await page.render({
         canvasContext: context,
         canvas,
-        viewport: viewport,
-      });
+        viewport,
+      }).promise;
     }
   });
 

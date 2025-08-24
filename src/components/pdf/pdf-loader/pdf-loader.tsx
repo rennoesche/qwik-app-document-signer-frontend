@@ -1,105 +1,54 @@
-import { component$, useSignal, useStore, useVisibleTask$ } from '@builder.io/qwik';
-import { qwikify$ } from '@builder.io/qwik-react';
-import * as pdfjsLib from 'pdfjs-dist';
-import type { PDFDocumentProxy } from 'pdfjs-dist';
-import { Progress } from '../../../integrations/components/ui/progress';
-import { PdfViewer } from '../pdf-viewer/pdf-viewer';
+import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik'
+import { PdfViewer } from "../pdf-viewer/pdf-viewer"
 
-const ProgressBar = qwikify$(Progress, { eagerness: 'idle' });
+export interface PdfLoaderProps { fileId: string; authToken: string; }
+export interface PdfViewerStore { filename: string, scale: number }
 
-export interface PdfLoaderProps {
-  fileId: string;
-  authToken: string;
-}
-export interface PdfViewerStore {
-  filename: string;
-  scale: number;
-}
+export const PdfLoader = component$<{ store: PdfViewerStore, props: PdfLoaderProps }>(({ store, props }) => {
+  const loading = useSignal(true)
+  const error = useSignal<string | null>(null)
+  const pdfUrlSig = useSignal<string | null>(null)
 
-export const usePdfViewerStore = () => {
-  return useStore<PdfViewerStore>({
-    filename: '',
-    scale: 1.0,
-  });
-};
-
-export const PdfLoader = component$<PdfLoaderProps>((props) => {
-  const loading = useSignal(true);
-  const error = useSignal('');
-  const loadingProgress = useSignal(0);
-  
-  const pdfDocument = useSignal<PDFDocumentProxy>();
-  
-  const store = usePdfViewerStore();
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     try {
-      loading.value = true;
-      loadingProgress.value = 0;
-      error.value = '';
+      loading.value = true
+      error.value = null
 
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+      const apiUrl = `${import.meta.env.VITE_API_URL}documents/${props.fileId}/`
 
-      loadingProgress.value = 10;
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}documents/download?document_id=${props.fileId}`,
-        {
-          credentials: 'include',
-          headers: { Authorization: `Bearer ${props.authToken}` },
-        }
-      );
-      loadingProgress.value = 30;
+      const res = await fetch(apiUrl, {
+        credentials: 'include',
+        headers: {
+          "Authorization": `Bearer ${props.authToken}`,
+        },
+      })
+      if (!res.ok) throw new Error(`Failed to load PDF: ${res.statusText}`)
 
-      if (!response.ok) {
-        if (response.status === 401) throw new Error('Authentication required. Please log in.');
-        if (response.status === 403) throw new Error('You do not have permission to access this document.');
-        if (response.status === 404) throw new Error('Document not found.');
-        throw new Error(`Failed to load document (Error ${response.status})`);
-      }
+      const arrayBuffer = await res.arrayBuffer()
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" })
+      pdfUrlSig.value = URL.createObjectURL(blob)
 
-      const contentDisposition = response.headers.get('Content-Disposition');
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (filenameMatch && filenameMatch[1]) {
-          store.filename = filenameMatch[1]; // Set filename di store
-        }
-      }
-
-      loadingProgress.value = 50;
-      const pdfData = await response.arrayBuffer();
-      loadingProgress.value = 70;
-      const loadedPdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-      loadingProgress.value = 90;
-      
-      pdfDocument.value = loadedPdf;
-
-    } catch (err: any) {
-      console.error('PDF fetch error:', err);
-      error.value = err.message || 'An unexpected error occurred.';
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : String(err)
     } finally {
-      loading.value = false;
-      loadingProgress.value = 100;
+      loading.value = false
     }
-  });
+  })
 
   return (
-    <div class="w-full items-center">
+    <div class="relative flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-900">
       {loading.value && (
-        <div class="flex w-full flex-col items-center justify-center p-8 text-gray-500">
-          <ProgressBar value={loadingProgress.value} />
-          <p class="mt-2">Loading document... {loadingProgress.value}%</p>
+        <div class="animate-pulse text-gray-600 dark:text-gray-300">
+          Loading PDF...
         </div>
       )}
-
-      {!loading.value && error.value && (
-        <div class="mx-auto my-8 w-full max-w-2xl rounded-md border border-red-400 bg-red-100 p-4 text-center text-red-700">
-          {error.value}
-        </div>
+      {error.value && (
+        <div class="text-red-600 dark:text-red-400">{error.value}</div>
       )}
-
-      {!loading.value && !error.value && pdfDocument.value && (
-        <PdfViewer pdfDocument={pdfDocument.value} store={store} />
+      {!loading.value && !error.value && pdfUrlSig.value && (
+        <PdfViewer pdfUrl={pdfUrlSig.value} store={store} />
       )}
     </div>
-  );
-});
+  )
+})

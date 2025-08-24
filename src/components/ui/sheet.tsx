@@ -31,11 +31,10 @@ interface SheetPortalProps
 
 const SheetPortal = ({
   position,
-  className,
   children,
   ...props
 }: SheetPortalProps) => (
-  <SheetPrimitive.Portal className={cn(className)} {...props}>
+  <SheetPrimitive.Portal {...props}>
     <div className={portalVariants({ position })}>{children}</div>
   </SheetPrimitive.Portal>
 )
@@ -52,7 +51,9 @@ const SheetOverlay = React.forwardRef<
     )}
     {...props}
     ref={ref}
-  />
+  >
+    {children}
+  </SheetPrimitive.Overlay>
 ))
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
